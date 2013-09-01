@@ -2448,7 +2448,13 @@
   <java-symbol type="bool" name="config_zero_balance_operator"/>
   <java-symbol type="bool" name="config_passpoint_setting_on" />
 
+
   <java-symbol type="string" name="power_key_emergency_number" />
   <java-symbol type="integer" name="power_key_hits_emergency" />
   <java-symbol type="bool" name="config_emergencyCallOnPowerkeyTapGestureEnabled" />
+
+  <!-- Package Manager -->
+  <java-symbol type="array" name="config_disabledComponents" />
+
+
 </resources>
