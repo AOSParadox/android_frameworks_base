@@ -1695,4 +1695,7 @@
     <!-- Label that replaces other notification controls when the notification is from the system
          and cannot be silenced (see @string/show_silently) or blocked (see @string/block) -->
     <string name="cant_silence_or_block">Notifications can\'t be silenced or blocked</string>
+
+    <!-- Network traffic monitor string format -->
+    <string name="network_traffic_format"><xliff:g id="value">%1$s</xliff:g> <xliff:g id="unit" example="kB">%2$s</xliff:g>/s</string>
 </resources>
