@@ -2234,6 +2234,8 @@ public class ConnectivityService extends IConnectivityManager.Stub
             NetworkFactoryInfo nfi = mNetworkFactoryInfos.remove(msg.replyTo);
             if (DBG && nfi != null) log("unregisterNetworkFactory for " + nfi.name);
         }
+        NetworkFactoryInfo nfi = mNetworkFactoryInfos.remove(msg.replyTo);
+        if (DBG && nfi != null) log("unregisterNetworkFactory for " + nfi.name);
     }
 
     // If this method proves to be too slow then we can maintain a separate
