@@ -324,7 +324,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private TaskManager mTaskManager;
     private LinearLayout mTaskManagerPanel;
     private ImageButton mTaskManagerButton;
-    private boolean showTaskList = false;
+    private boolean mShowTaskList = false;
 
     // top bar
     StatusBarHeaderView mHeader;
@@ -1030,7 +1030,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             });
         }
 
-        // task manager
+        // Task manager
         if (mContext.getResources().getBoolean(R.bool.config_showTaskManagerSwitcher)) {
             mTaskManagerPanel =
                     (LinearLayout) mStatusBarWindow.findViewById(R.id.task_manager_panel);
@@ -1040,8 +1040,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             mTaskManagerButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View arg0) {
-                    showTaskList = !showTaskList;
-                    mNotificationPanel.setTaskManagerVisibility(showTaskList);
+                    mShowTaskList = !mShowTaskList;
+                    mNotificationPanel.setTaskManagerVisibility(mShowTaskList);
                 }
             });
         }
@@ -3210,6 +3210,16 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mContext.getContentResolver().registerContentObserver(
                 Settings.Secure.getUriFor(Settings.Secure.USER_SETUP_COMPLETE), true,
                 mUserSetupObserver, mCurrentUserId);
+    }
+
+
+    public void resetQsPanelVisibility() {
+        mShowTaskList = mShowTaskList;
+        if (mShowTaskList) {
+            mQSPanel.setVisibility(View.VISIBLE);
+            mTaskManagerPanel.setVisibility(View.GONE);
+            mShowTaskList = false;
+        }
     }
 
     /**
