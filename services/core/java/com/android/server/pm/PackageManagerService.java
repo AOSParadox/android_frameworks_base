@@ -195,6 +195,8 @@ import android.util.SparseBooleanArray;
 import android.util.SparseIntArray;
 import android.util.Xml;
 import android.view.Display;
+import android.view.WindowManager;
+import android.view.WindowManagerPolicy;
 
 import dalvik.system.DexFile;
 import dalvik.system.VMRuntime;
@@ -221,6 +223,7 @@ import com.android.server.EventLogTags;
 import com.android.server.FgThread;
 import com.android.server.IntentResolver;
 import com.android.server.LocalServices;
+import com.android.server.policy.PhoneWindowManager;
 import com.android.server.ServiceThread;
 import com.android.server.SystemConfig;
 import com.android.server.Watchdog;
@@ -924,6 +927,9 @@ public class PackageManagerService extends IPackageManager.Stub {
 
     // Stores a list of users whose package restrictions file needs to be updated
     private ArraySet<Integer> mDirtyUsers = new ArraySet<Integer>();
+
+    WindowManager mWindowManager;
+    private final WindowManagerPolicy mPolicy; // to set packageName
 
     final private DefaultContainerConnection mDefContainerConn =
             new DefaultContainerConnection();
@@ -1858,6 +1864,11 @@ public class PackageManagerService extends IPackageManager.Stub {
             mDefParseFlags = 0;
             mSeparateProcesses = null;
         }
+
+        mWindowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        Display d = mWindowManager.getDefaultDisplay();
+        mPolicy = new PhoneWindowManager();
+        d.getMetrics(mMetrics);
 
         mInstaller = installer;
         mPackageDexOptimizer = new PackageDexOptimizer(this);
@@ -6255,6 +6266,15 @@ public class PackageManagerService extends IPackageManager.Stub {
         }
         if (!isFirstBoot()) {
             try {
+                // give the packagename to the PhoneWindowManager
+                ApplicationInfo ai;
+                try {
+                    ai = mContext.getPackageManager().getApplicationInfo(pkg.packageName, 0);
+                } catch (Exception e) {
+                    ai = null;
+                }
+                mPolicy.setPackageName((String) (ai != null ? mContext.getPackageManager().getApplicationLabel(ai) : pkg.packageName));
+
                 ActivityManagerNative.getDefault().showBootMessage(
                         mContext.getResources().getString(R.string.android_upgrading_apk,
                                 curr, total), true);
