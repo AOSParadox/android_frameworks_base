@@ -70,6 +70,7 @@ public class KeyHandler {
     private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
     private static final int GESTURE_REQUEST = 1;
+    private static final int GESTURE_WAKE_LOCK_DURATION = 3000; // ms
 
     private static final int MAX_SUPPORTED_GESTURES = 15;
 
@@ -447,7 +448,7 @@ public class KeyHandler {
             Log.w(TAG, "handleCodeBehavior: gesture = " + gesture);
         }
 
-        acquireGestureWakeLock(0);
+        acquireGestureWakeLock(GESTURE_WAKE_LOCK_DURATION);
 
         switch(gesture) {
             case CAMERA:
@@ -510,10 +511,9 @@ public class KeyHandler {
                 }, 1500);
                 break;
             default:
+                releaseGestureWakeLock();
                 break;
         }
-
-        releaseGestureWakeLock();
     }
 
     private void acquireGestureWakeLock(int duration) {
