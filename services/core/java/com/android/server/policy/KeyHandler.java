@@ -40,6 +40,7 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.os.PowerManagerInternal;
 import android.os.Process;
 import android.os.RemoteException;
 import android.os.SystemClock;
@@ -100,6 +101,7 @@ public class KeyHandler {
 
     private final Context mContext;
     private PowerManager mPowerManager;
+    private PowerManagerInternal mPowerManagerInternal;
     private String mCameraId;
     private EventHandler mHandler;
     private HandlerThread mHandlerThread;
@@ -389,6 +391,10 @@ public class KeyHandler {
         if (mPowerManager == null) {
             mPowerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
         }
+        if (mPowerManagerInternal == null) {
+            mPowerManagerInternal = LocalServices.getService(PowerManagerInternal.class);
+
+        }
     }
 
     private void ensureSensors() {
@@ -506,6 +512,8 @@ public class KeyHandler {
 
         acquireGestureWakeLock(GESTURE_WAKE_LOCK_DURATION);
 
+        mPowerManagerInternal.powerHint(PowerManagerInternal.POWER_HINT_INTERACTION, 0);
+
         switch(gesture) {
             case CAMERA:
                 doHapticFeedback();
@@ -534,37 +542,52 @@ public class KeyHandler {
                 break;
             case WAKE_UP:
                 doHapticFeedback();
-                mPowerManager.wakeUp(SystemClock.uptimeMillis());
-                break;
-            case DIALER:
-                doHapticFeedback();
-                mPowerManager.wakeUp(SystemClock.uptimeMillis());
-                if (isKeyguardShowing()) {
-                    dismissKeyguard();
-                }
-                Intent dialIntent = new Intent(Intent.ACTION_DIAL);
-                dialIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(dialIntent, null);
-                break;
-            case AIRPLANE:
-                doHapticFeedback();
-                mPowerManager.wakeUp(SystemClock.uptimeMillis());
-                // Change the system setting
-                boolean enabled = Settings.Global.getInt(mContext.getContentResolver(),
-                        Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
-                Settings.Global.putInt(mContext.getContentResolver(),
-                        Settings.Global.AIRPLANE_MODE_ON, !enabled ? 1 : 0);
-                // Post the intent
-                Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
-                intent.addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
-                intent.putExtra("state", enabled);
-                mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mPowerManager.goToSleep(SystemClock.uptimeMillis());
+                        mPowerManager.wakeUp(SystemClock.uptimeMillis());
                     }
-                }, 1500);
+                }, 150);
+                break;
+            case DIALER:
+                doHapticFeedback();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mPowerManager.wakeUp(SystemClock.uptimeMillis());
+                        if (isKeyguardShowing()) {
+                            dismissKeyguard();
+                        }
+                        Intent dialIntent = new Intent(Intent.ACTION_DIAL);
+                        dialIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(dialIntent, null);
+                    }
+                }, 150);
+                break;
+            case AIRPLANE:
+                doHapticFeedback();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Change the system setting
+                        boolean enabled = Settings.Global.getInt(mContext.getContentResolver(),
+                                Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+                        Settings.Global.putInt(mContext.getContentResolver(),
+                                Settings.Global.AIRPLANE_MODE_ON, !enabled ? 1 : 0);
+                        // Post the intent
+                        Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+                        intent.addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
+                        intent.putExtra("state", enabled);
+                        mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
+                        mPowerManager.wakeUp(SystemClock.uptimeMillis());
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mPowerManager.goToSleep(SystemClock.uptimeMillis());
+                            }
+                        }, 1500);
+                    }
+                }, 150);
                 break;
             default:
                 releaseGestureWakeLock();
