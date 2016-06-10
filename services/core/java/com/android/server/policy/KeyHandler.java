@@ -46,6 +46,7 @@ import android.os.SystemClock;
 import android.os.UserHandle;
 import android.os.Vibrator;
 import android.provider.Settings;
+import android.telecom.TelecomManager;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.KeyEvent;
@@ -104,6 +105,7 @@ public class KeyHandler {
     private SensorManager mSensorManager;
     private CameraManager mCameraManager;
     private AudioManager mAudioManager;
+    private TelecomManager mTelecomManager;
     private StatusBarManagerInternal mStatusBarManagerInternal;
     private KeyguardManager mKeyguardManager;
     private Sensor mProximitySensor;
@@ -191,6 +193,7 @@ public class KeyHandler {
 
         // Set up managers.
         ensureAudioManager();
+        ensureTelecomManager();
         ensureVibrator();
         ensurePowerManager();
         ensureSensors();
@@ -305,6 +308,12 @@ public class KeyHandler {
     private void ensureAudioManager() {
         if (mAudioManager == null) {
             mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        }
+    }
+
+    private void ensureTelecomManager() {
+        if (mTelecomManager == null) {
+            mTelecomManager = TelecomManager.from(mContext);
         }
     }
 
@@ -525,7 +534,7 @@ public class KeyHandler {
             Log.w(TAG, "handleKeyEvent(): event.toString(): " + event.toString());
         }
 
-        if (!mSystemReady || !mGesturesEnabled) {
+        if (!mSystemReady || !mGesturesEnabled || isDisabledByPhoneState()) {
             return false;
         }
 
@@ -703,5 +712,12 @@ public class KeyHandler {
             out[i] = ar[i];
         }
         return out;
+    }
+
+    private boolean isDisabledByPhoneState() {
+        if (mTelecomManager != null) {
+            return mTelecomManager.isInCall() || mTelecomManager.isRinging();
+        }
+        return false;
     }
 }
