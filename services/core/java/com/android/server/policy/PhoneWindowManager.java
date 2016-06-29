@@ -665,6 +665,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     // Maps global key codes to the components that will handle them.
     private GlobalKeyManager mGlobalKeyManager;
 
+    // Gesture key handler.
+    private KeyHandler mKeyHandler;
+
     // Fallback actions by key code.
     private final SparseArray<KeyCharacterMap.FallbackAction> mFallbackActions =
             new SparseArray<KeyCharacterMap.FallbackAction>();
@@ -1679,6 +1682,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         mWindowManagerInternal.registerAppTransitionListener(
                 mStatusBarController.getAppTransitionListener());
+
+        boolean enableKeyHandler = context.getResources().
+                getBoolean(com.android.internal.R.bool.config_enableKeyHandler);
+        if (enableKeyHandler) {
+            mKeyHandler = new KeyHandler(mContext);
+        }
     }
 
     private void updateKeyAssignments() {
@@ -5165,6 +5174,16 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     + " policyFlags=" + Integer.toHexString(policyFlags));
         }
 
+        /**
+         * Handle gestures input earlier then anything when screen is off.
+         * @author Carlo Savignano
+         */
+        if (!interactive) {
+            if (mKeyHandler != null && mKeyHandler.handleKeyEvent(event)) {
+                return 0;
+            }
+        }
+
         // Basic policy based on interactive state.
         int result;
         boolean isWakeKey = (policyFlags & WindowManagerPolicy.FLAG_WAKE) != 0
@@ -6359,6 +6378,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mKeyguardDelegate.onBootCompleted();
         }
         mSystemGestures.systemReady();
+
+        mKeyHandler.systemReady();
     }
 
     /** {@inheritDoc} */
