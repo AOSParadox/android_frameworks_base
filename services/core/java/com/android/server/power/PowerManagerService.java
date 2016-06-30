@@ -442,6 +442,8 @@ public final class PowerManagerService extends SystemService
     private boolean mGesturesEnabled;
 
     private boolean mSupportsDoubleTapWakeConfig;
+    private boolean mSupportsDrawCConfig;
+    private boolean mSupportsDrawEConfig;
     private boolean mSupportsDrawVConfig;
     private boolean mSupportsDrawInverseVConfig;
     private boolean mSupportsDrawOConfig;
@@ -456,6 +458,8 @@ public final class PowerManagerService extends SystemService
     private boolean mSupportsTwoFingerSwipeConfig;
 
     private boolean mDoubleTapWakeEnabled;
+    private boolean mDrawCEnabled;
+    private boolean mDrawEEnabled;
     private boolean mDrawVEnabled;
     private boolean mDrawInverseVEnabled;
     private boolean mDrawOEnabled;
@@ -472,18 +476,20 @@ public final class PowerManagerService extends SystemService
     // Power features defined in hardware/libhardware/include/hardware/power.h.
     private static final int POWER_FEATURE_GESTURES = 1;
     private static final int POWER_FEATURE_DOUBLE_TAP_TO_WAKE = 2;
-    private static final int POWER_FEATURE_DRAW_V = 3;
-    private static final int POWER_FEATURE_DRAW_INVERSE_V = 4;
-    private static final int POWER_FEATURE_DRAW_O = 5;
-    private static final int POWER_FEATURE_DRAW_M = 6;
-    private static final int POWER_FEATURE_DRAW_W = 7;
-    private static final int POWER_FEATURE_DRAW_ARROW_LEFT = 8;
-    private static final int POWER_FEATURE_DRAW_ARROW_RIGHT = 9;
-    private static final int POWER_FEATURE_ONE_FINGER_SWIPE_UP = 10;
-    private static final int POWER_FEATURE_ONE_FINGER_SWIPE_RIGHT = 11;
-    private static final int POWER_FEATURE_ONE_FINGER_SWIPE_DOWN = 12;
-    private static final int POWER_FEATURE_ONE_FINGER_SWIPE_LEFT = 13;
-    private static final int POWER_FEATURE_TWO_FINGER_SWIPE = 14;
+    private static final int POWER_FEATURE_DRAW_C = 3;
+    private static final int POWER_FEATURE_DRAW_E = 4;
+    private static final int POWER_FEATURE_DRAW_V = 5;
+    private static final int POWER_FEATURE_DRAW_INVERSE_V = 6;
+    private static final int POWER_FEATURE_DRAW_O = 7;
+    private static final int POWER_FEATURE_DRAW_M = 8;
+    private static final int POWER_FEATURE_DRAW_W = 9;
+    private static final int POWER_FEATURE_DRAW_ARROW_LEFT = 10;
+    private static final int POWER_FEATURE_DRAW_ARROW_RIGHT = 11;
+    private static final int POWER_FEATURE_ONE_FINGER_SWIPE_UP = 12;
+    private static final int POWER_FEATURE_ONE_FINGER_SWIPE_RIGHT = 13;
+    private static final int POWER_FEATURE_ONE_FINGER_SWIPE_DOWN = 14;
+    private static final int POWER_FEATURE_ONE_FINGER_SWIPE_LEFT = 15;
+    private static final int POWER_FEATURE_TWO_FINGER_SWIPE = 16;
 
     private final ArrayList<PowerManagerInternal.LowPowerModeListener> mLowPowerModeListeners
             = new ArrayList<PowerManagerInternal.LowPowerModeListener>();
@@ -523,6 +529,8 @@ public final class PowerManagerService extends SystemService
             nativeSetInteractive(true);
             nativeSetFeature(POWER_FEATURE_GESTURES, 0);
             nativeSetFeature(POWER_FEATURE_DOUBLE_TAP_TO_WAKE, 0);
+            nativeSetFeature(POWER_FEATURE_DRAW_C, 0);
+            nativeSetFeature(POWER_FEATURE_DRAW_E, 0);
             nativeSetFeature(POWER_FEATURE_DRAW_V, 0);
             nativeSetFeature(POWER_FEATURE_DRAW_INVERSE_V, 0);
             nativeSetFeature(POWER_FEATURE_DRAW_O, 0);
@@ -660,6 +668,12 @@ public final class PowerManagerService extends SystemService
                     Settings.System.GESTURE_DOUBLE_TAP),
                     false, mSettingsObserver, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURE_DRAW_C),
+                    false, mSettingsObserver, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURE_DRAW_E),
+                    false, mSettingsObserver, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.GESTURE_DRAW_V),
                     false, mSettingsObserver, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -749,6 +763,10 @@ public final class PowerManagerService extends SystemService
         mSupportsDoubleTapWakeConfig = resources.getInteger(
                 com.android.internal.R.integer.config_doubleTapKeyCode) > 0;
         mSupportsDrawVConfig = resources.getInteger(
+                com.android.internal.R.integer.config_drawCKeyCode) > 0;
+        mSupportsDrawVConfig = resources.getInteger(
+                com.android.internal.R.integer.config_drawEKeyCode) > 0;
+        mSupportsDrawVConfig = resources.getInteger(
                 com.android.internal.R.integer.config_drawVKeyCode) > 0;
         mSupportsDrawInverseVConfig = resources.getInteger(
                 com.android.internal.R.integer.config_drawInverseVKeyCode) > 0;
@@ -818,7 +836,26 @@ public final class PowerManagerService extends SystemService
                         mDoubleTapWakeEnabled ? 1 : 0);
             }
         }
-
+        if (mSupportsDrawCConfig) {
+            boolean drawCEnabled = Settings.System.getIntForUser(resolver,
+                    Settings.System.GESTURE_DRAW_C, mContext.getResources()
+                    .getInteger(com.android.internal.R.integer.config_drawCDefault),
+                    UserHandle.USER_CURRENT) > 0 && mGesturesEnabled;
+            if (drawCEnabled != mDrawCEnabled) {
+                mDrawCEnabled = drawCEnabled;
+                nativeSetFeature(POWER_FEATURE_DRAW_C, mDrawCEnabled ? 1 : 0);
+            }
+        }
+        if (mSupportsDrawEConfig) {
+            boolean drawEEnabled = Settings.System.getIntForUser(resolver,
+                    Settings.System.GESTURE_DRAW_E, mContext.getResources()
+                    .getInteger(com.android.internal.R.integer.config_drawEDefault),
+                    UserHandle.USER_CURRENT) > 0 && mGesturesEnabled;
+            if (drawEEnabled != mDrawEEnabled) {
+                mDrawEEnabled = drawEEnabled;
+                nativeSetFeature(POWER_FEATURE_DRAW_E, mDrawEEnabled ? 1 : 0);
+            }
+        }
         if (mSupportsDrawVConfig) {
             boolean drawVEnabled = Settings.System.getIntForUser(resolver,
                     Settings.System.GESTURE_DRAW_V, mContext.getResources()
@@ -2966,6 +3003,8 @@ public final class PowerManagerService extends SystemService
             pw.println("  mScreenBrightnessSettingDefault=" + mScreenBrightnessSettingDefault);
             pw.println("  mGesturesEnabled=" + mGesturesEnabled);
             pw.println("  mDoubleTapWakeEnabled=" + mDoubleTapWakeEnabled);
+            pw.println("  mDrawCEnabled=" + mDrawCEnabled);
+            pw.println("  mDrawEEnabled=" + mDrawEEnabled);
             pw.println("  mDrawVEnabled=" + mDrawVEnabled);
             pw.println("  mDrawInverseVEnabled=" + mDrawInverseVEnabled);
             pw.println("  mDrawOEnabled=" + mDrawOEnabled);
