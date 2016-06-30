@@ -121,6 +121,8 @@ public class KeyHandler {
     private int mDoubleTapKeyCode;
     private int mDrawOKeyCode;
     private int mTwoFingerSwipeKeyCode;
+    private int mDrawCKeyCode;
+    private int mDrawEKeyCode;
     private int mDrawVKeyCode;
     private int mDrawInverseVKeyCode;
     private int mDrawArrowLeftKeyCode;
@@ -135,6 +137,8 @@ public class KeyHandler {
     private int mDoubleTapGesture;
     private int mDrawOGesture;
     private int mTwoFingerSwipeGesture;
+    private int mDrawCGesture;
+    private int mDrawEGesture;
     private int mDrawVGesture;
     private int mDrawInverseVGesture;
     private int mDrawArrowLeftGesture;
@@ -222,6 +226,9 @@ public class KeyHandler {
         mDoubleTapKeyCode = resources.getInteger(R.integer.config_doubleTapKeyCode);
         mDrawOKeyCode = resources.getInteger(R.integer.config_drawOKeyCode);
         mTwoFingerSwipeKeyCode = resources.getInteger(R.integer.config_twoFingerSwipeKeyCode);
+
+        mDrawCKeyCode = resources.getInteger(R.integer.config_drawCKeyCode);
+        mDrawEKeyCode = resources.getInteger(R.integer.config_drawEKeyCode);
         mDrawVKeyCode = resources.getInteger(R.integer.config_drawVKeyCode);
         mDrawInverseVKeyCode = resources.getInteger(R.integer.config_drawInverseVKeyCode);
         mDrawArrowLeftKeyCode = resources.getInteger(R.integer.config_drawArrowLeftKeyCode);
@@ -232,11 +239,12 @@ public class KeyHandler {
         mOneFingerSwipeLeftKeyCode = resources.getInteger(R.integer.config_oneFingerSwipeLeftKeyCode);
         mDrawMKeyCode = resources.getInteger(R.integer.config_drawMKeyCode);
         mDrawWKeyCode = resources.getInteger(R.integer.config_drawWKeyCode);
-
         mGestures.clear();
         mGestures.put(mDoubleTapKeyCode, mDoubleTapGesture);
         mGestures.put(mDrawOKeyCode, mDrawOGesture);
         mGestures.put(mTwoFingerSwipeKeyCode, mTwoFingerSwipeGesture);
+        mGestures.put(mDrawCKeyCode, mDrawCGesture);
+        mGestures.put(mDrawEKeyCode, mDrawEGesture);
         mGestures.put(mDrawVKeyCode, mDrawVGesture);
         mGestures.put(mDrawInverseVKeyCode, mDrawInverseVGesture);
         mGestures.put(mDrawArrowLeftKeyCode, mDrawArrowLeftGesture);
@@ -281,6 +289,22 @@ public class KeyHandler {
         if (twoFingerSwipeGesture != mTwoFingerSwipeGesture) {
             mTwoFingerSwipeGesture = twoFingerSwipeGesture;
             mGestures.put(mTwoFingerSwipeKeyCode, mTwoFingerSwipeGesture);
+        }
+
+        int drawCGesture = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.GESTURE_DRAW_C, mContext.getResources()
+                        .getInteger(com.android.internal.R.integer.config_drawCDefault));
+        if (drawCGesture != mDrawCGesture) {
+            mDrawCGesture = drawCGesture;
+            mGestures.put(mDrawCKeyCode, mDrawCGesture);
+        }
+
+        int drawEGesture = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.GESTURE_DRAW_E, mContext.getResources()
+                        .getInteger(com.android.internal.R.integer.config_drawEDefault));
+        if (drawEGesture != mDrawEGesture) {
+            mDrawEGesture = drawEGesture;
+            mGestures.put(mDrawEKeyCode, mDrawEGesture);
         }
 
         int drawVGesture = Settings.System.getInt(mContext.getContentResolver(),

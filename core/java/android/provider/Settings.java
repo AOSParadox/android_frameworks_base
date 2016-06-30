@@ -3593,6 +3593,18 @@ public final class Settings {
         public static final String GESTURE_DOUBLE_TAP = "gesture_double_tap";
 
         /**
+         * Controls whether draw C gesture is enabled.
+         * @hide
+         */
+        public static final String GESTURE_DRAW_C = "gesture_draw_c";
+
+        /**
+         * Controls whether draw E gesture is enabled.
+         * @hide
+         */
+        public static final String GESTURE_DRAW_E = "gesture_draw_e";
+
+        /**
          * Controls whether draw V gesture is enabled.
          * @hide
          */
@@ -3733,6 +3745,8 @@ public final class Settings {
             ACCELEROMETER_ROTATION,
             GESTURES_ENABLED,
             GESTURE_DOUBLE_TAP,
+            GESTURE_DRAW_C,
+            GESTURE_DRAW_E,
             GESTURE_DRAW_V,
             GESTURE_DRAW_INVERSE_V,
             GESTURE_DRAW_O,
