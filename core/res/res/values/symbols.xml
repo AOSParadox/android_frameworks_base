@@ -2497,8 +2497,4 @@
   <!-- Whether to to intercept inputs on screen off. -->
   <java-symbol type="bool" name="config_enableKeyHandler" />
 
-    <!-- KeyDisabler Support -->
-  <java-symbol type="bool" name="config_canDisableHardwareKeys" />
-  <java-symbol type="string" name="config_KeyDisablerPath" />
-
 </resources>
