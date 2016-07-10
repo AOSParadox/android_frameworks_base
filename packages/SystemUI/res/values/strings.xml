@@ -575,6 +575,9 @@
     <!-- Announcement made when the rotation lock state changes to portrait only (not shown on the screen).  [CHAR LIMIT=NONE] -->
     <string name="accessibility_rotation_lock_on_portrait_changed">Screen is now locked in portrait orientation.</string>
 
+    <!-- Content description of the Substratum QS Tile. [CHAR LIMIT=NONE] -->
+    <string name="accessibility_quick_settings_substratum">substratum.</string>
+
     <!-- Name of the K-release easter egg: a display case for all our tastiest desserts. [CHAR LIMIT=30] -->
     <string name="dessert_case">Dessert Case</string>
 
@@ -690,6 +693,8 @@
     <string name="quick_settings_cellular_detail_data_limit"><xliff:g id="data_limit" example="2.0 GB">%s</xliff:g> limit</string>
     <!-- QuickSettings: Cellular detail panel, data warning format string [CHAR LIMIT=NONE] -->
     <string name="quick_settings_cellular_detail_data_warning"><xliff:g id="data_limit" example="2.0 GB">%s</xliff:g> warning</string>
+    <!-- QuickSettings: Substratum QS Tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_substratum_label">substratum</string>
 
     <!-- Recents: The empty recents string. [CHAR LIMIT=NONE] -->
     <string name="recents_empty_message">Your recent screens appear here</string>
