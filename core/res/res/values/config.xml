@@ -2603,4 +2603,7 @@
     <!-- Whether to to intercept inputs on screen off. -->
     <bool name="config_enableKeyHandler">false</bool>
 
+    <!-- KeyDisabler Support -->
+    <bool name="config_canDisableHardwareKeys">false</bool>
+    <string name="config_KeyDisablerPath" translatable="false">0</string>
 </resources>
