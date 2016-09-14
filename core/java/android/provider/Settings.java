@@ -3656,6 +3656,12 @@ public final class Settings {
         public static final String NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD = "network_traffic_autohide_threshold";
 
         /**
+         * Whether to disable showing arrows in network traffic indicators
+         * @hide
+         */
+        public static final String NETWORK_TRAFFIC_HIDEARROW = "network_traffic_hidearrow";
+
+        /**
          * Enable looking up of phone numbers of nearby places
          * @hide
          */
