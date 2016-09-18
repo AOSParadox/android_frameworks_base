@@ -6575,12 +6575,8 @@ public final class Settings {
             MOUNT_UMS_PROMPT,
             MOUNT_UMS_NOTIFY_ENABLED,
             SLEEP_TIMEOUT,
-<<<<<<< HEAD
-            DOUBLE_TAP_TO_WAKE,
             WAKE_GESTURE_ENABLED,
             LONG_PRESS_TIMEOUT,
-=======
->>>>>>> e23796b... input: Add gestures control
             CAMERA_GESTURE_DISABLED,
             ACCESSIBILITY_AUTOCLICK_ENABLED,
             ACCESSIBILITY_AUTOCLICK_DELAY,
