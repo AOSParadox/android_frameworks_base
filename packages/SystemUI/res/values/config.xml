@@ -329,6 +329,6 @@
     <bool name="config_showBatteryPercentage">false</bool>
 
     <!-- Whether to enable to show task manager or not -->
-    <bool name="config_showTaskManagerSwitcher">true</bool>
+    <bool name="config_showTaskManagerSwitcher">false</bool>
 </resources>
 
