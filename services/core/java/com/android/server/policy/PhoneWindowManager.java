@@ -2064,7 +2064,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mLongPressOnHomeBehavior = KEY_ACTION_NOTHING;
         }
 
-        mDoubleTapOnHomeBehavior = res.getInteger(
+        mDoubleTapOnHomeBehavior = mContext.getResources().getInteger(
                 com.android.internal.R.integer.config_doubleTapOnHomeBehavior);
         if (mDoubleTapOnHomeBehavior < KEY_ACTION_NOTHING ||
                 mDoubleTapOnHomeBehavior > KEY_ACTION_SLEEP) {
@@ -2110,7 +2110,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mShortPressWindowBehavior = SHORT_PRESS_WINDOW_PICTURE_IN_PICTURE;
         }
 
-        mNavBarOpacityMode = res.getInteger(
+        mNavBarOpacityMode = mContext.getResources().getInteger(
                 com.android.internal.R.integer.config_navBarOpacityMode);
     }
 
