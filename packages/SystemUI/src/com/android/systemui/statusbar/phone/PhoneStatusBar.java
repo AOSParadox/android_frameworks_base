@@ -467,7 +467,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 (NavigationBarView) View.inflate(mContext, R.layout.navigation_bar, null);
 
         mNavigationBarView.setDisabledFlags(mDisabled1);
-        mNavigationBarView.setBar(this);
         addNavigationBar();
     }
 
