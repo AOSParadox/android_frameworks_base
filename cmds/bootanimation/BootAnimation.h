@@ -51,12 +51,6 @@ private:
     virtual void        onFirstRef();
     virtual void        binderDied(const wp<IBinder>& who);
 
-    enum {
-        eOrientationDefault     = 0,
-        eOrientation90          = 1,
-        eOrientation180         = 2,
-        eOrientation270         = 3,
-    };
     struct Texture {
         GLint   w;
         GLint   h;

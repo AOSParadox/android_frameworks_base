@@ -32,8 +32,9 @@ import android.view.Display;
 import android.view.IWindowManager;
 import android.view.Surface;
 import android.view.WindowManagerGlobal;
+
 import com.android.internal.R;
-import android.os.SystemProperties;
+
 /**
  * Provides helper functions for configuring the display rotation policy.
  */
@@ -141,14 +142,7 @@ public final class RotationPolicy {
                 try {
                     IWindowManager wm = WindowManagerGlobal.getWindowManagerService();
                     if (enabled) {
-                        //Consider input rotation parameter even if display panel is mounted
-                        //with 90 or 180 or 270 degrees rotated.
-                        if (rotation < 0) {
-                           wm.freezeRotation(rotation);
-                        } else {
-                           wm.freezeRotation(SystemProperties.getInt(
-                                "persist.panel.orientation", 0)/90);
-                        }
+                        wm.freezeRotation(rotation);
                     } else {
                         wm.thawRotation();
                     }
