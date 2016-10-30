@@ -45,14 +45,14 @@ public class RegionalizationEnvironment {
     private final static String TAG = "RegionalizationEnvironment";
 
     private final static boolean SUPPORTED = SystemProperties.getBoolean(
-            "ro.regionalization.support", false);
+            "persist.regionalization.support", false);
     private final static boolean DEBUG = true;
 
     private static IRegionalizationService mRegionalizationService = null;
 
     private final static String SPEC_FILE_PATH = "/persist/speccfg/spec";
 
-    private static ArrayList<Package> mPackages = new ArrayList<Package>();
+    private static ArrayList<Carrier> mCarriers = new ArrayList<Carrier>();
     private static ArrayList<String> mExcludedApps = new ArrayList<String>();
 
     private static boolean isLoaded = false;
@@ -60,7 +60,7 @@ public class RegionalizationEnvironment {
         IBinder iBinder = ServiceManager.getService("regionalization");
         mRegionalizationService = IRegionalizationService.Stub.asInterface(iBinder);
         if (mRegionalizationService != null) {
-            loadSwitchedPackages();
+            loadSwitchedCarriers();
             loadExcludedApplist();
             isLoaded = true;
         }
@@ -79,30 +79,30 @@ public class RegionalizationEnvironment {
     /**
      * {@hide}
      */
-    public static int getPackagesCount() {
-        return mPackages.size();
+    public static int getCarriersCount() {
+        return mCarriers.size();
     }
 
     /**
      * {@hide}
      */
-    public static List<String> getAllPackageNames() {
-        ArrayList<String> packages = new ArrayList<String>();
-        for (Package p : mPackages) {
-            packages.add(p.getName());
+    public static List<String> getAllCarrierNames() {
+        ArrayList<String> carriers = new ArrayList<String>();
+        for (Carrier c : mCarriers) {
+            carriers.add(c.getName());
         }
-        return packages;
+        return carriers;
     }
 
     /**
      * {@hide}
      */
-    public static List<File> getAllPackageDirectories() {
+    public static List<File> getAllCarrierDirectories() {
         ArrayList<File> directories = new ArrayList<File>();
-        for (Package p : mPackages) {
+        for (Carrier c : mCarriers) {
             if (DEBUG)
-                Log.v(TAG, "Package Directoriy(" + p.getPriority() + "):" + p.getDirectory());
-            directories.add(p.getDirectory());
+                Log.v(TAG, "CarrierDirectoriy(" + c.getPriority() + "):" + c.getDirectory());
+            directories.add(c.getDirectory());
         }
         return directories;
     }
@@ -110,8 +110,8 @@ public class RegionalizationEnvironment {
     /**
      * {@hide}
      */
-    public static boolean isExcludedApp(String appName) {
-        if (getPackagesCount() == 0) {
+    public static boolean isExclucdedApp(String appName) {
+        if (getCarriersCount() == 0) {
             return false;
         }
 
@@ -133,23 +133,23 @@ public class RegionalizationEnvironment {
      * {@hide}
      */
     public static String getStoragePos() {
-        for (Package pack: mPackages) {
-            String pos = pack.getStoragePos();
+        for (Carrier carrier: mCarriers) {
+            String pos = carrier.getStoragePos();
             if (!TextUtils.isEmpty(pos))
                 return pos;
         }
         try {
-            mPackages.clear();
-            throw new IOException("Read wrong package for Carrier!");
+            mCarriers.clear();
+            throw new IOException("Read wrong carrier!");
         } catch (IOException e) {
             Log.e(TAG, "Get storage pos error, caused by: " + e.getMessage());
         }
         return "";
     }
 
-    private static void loadSwitchedPackages() {
+    private static void loadSwitchedCarriers() {
         if (DEBUG)
-            Log.d(TAG, "load packages for Carrier!");
+            Log.d(TAG, "loadCarriers!");
 
         try {
             ArrayList<String> contents = null;
@@ -163,52 +163,52 @@ public class RegionalizationEnvironment {
             if (contents != null && contents.size() > 0) {
                 // Get storage pos of carrier pack
                 if (!contents.get(0).startsWith("packStorage=")) {
-                    throw new IOException("Can't read storage pos for Carrier package!");
+                    throw new IOException("Can't read carrier's storage pos!");
                 }
                 String storagePos = contents.get(0).substring("packStorage=".length());
                 if (TextUtils.isEmpty(storagePos)) {
-                    throw new IOException("Storage pos for Carrier package is wrong!");
+                    throw new IOException("Carrier's storage pos is wrong!");
                 }
 
                 // Get carrier pack count
-                String packNumRegularExpresstion = "^packCount=[0-9]$";
-                if (!contents.get(1).matches(packNumRegularExpresstion)) {
-                    throw new IOException("Can't read package count of Carrier!");
+                String carrierNumRegularExpresstion = "^packCount=[0-9]$";
+                if (!contents.get(1).matches(carrierNumRegularExpresstion)) {
+                    throw new IOException("Can't read carrier's count!");
                 }
-                int packNum = Integer.parseInt(contents.get(1)
+                int carriersNum = Integer.parseInt(contents.get(1)
                         .substring("packCount=".length()));
-                if (packNum <= 0 || contents.size() <= packNum) {
-                    throw new IOException("Package count of Carrier is wrong!");
+                if (carriersNum <= 0 || contents.size() <= carriersNum) {
+                    throw new IOException("Carrier's count is wrong!");
                 }
 
-                for (int i = 2; i < packNum + 2; i++) {
-                    String packRegularExpresstion = "^strSpec[0-9]=\\w+$";
-                    if (contents.get(i).matches(packRegularExpresstion)) {
-                        String packName = contents.get(i).substring("strSpec".length() + 2);
-                        if (!TextUtils.isEmpty(packName)) {
+                for (int i = 2; i < carriersNum + 2; i++) {
+                    String carrierRegularExpresstion = "^strSpec[0-9]=\\w+$";
+                    if (contents.get(i).matches(carrierRegularExpresstion)) {
+                        String carrierName = contents.get(i).substring("strSpec".length() + 2);
+                        if (!TextUtils.isEmpty(carrierName)) {
                             boolean exists = false;
                             try {
                                 exists = mRegionalizationService.checkFileExists(
-                                    storagePos + "/" + packName);
+                                    storagePos + "/" + carrierName);
                             } catch (RemoteException e) {
                                 e.printStackTrace();
                             }
 
                             if (exists) {
-                                mPackages.add(new Package(packName, i, storagePos));
+                                mCarriers.add(new Carrier(carrierName, i, storagePos));
                             } else {
-                                mPackages.clear();
-                                throw new IOException("Read wrong packages for Carrier!");
+                                mCarriers.clear();
+                                throw new IOException("Read wrong carrier!");
                             }
                         }
                     } else {
-                        mPackages.clear();
-                        throw new IOException("Read wrong packages for Carrier!");
+                        mCarriers.clear();
+                        throw new IOException("Read wrong carrier!");
                     }
                 }
             }
         } catch (IOException e) {
-            Log.e(TAG, "Load package for carrier error, caused by: " + e.getMessage());
+            Log.e(TAG, "Load carriers error, caused by: " + e.getMessage());
         }
     }
 
@@ -216,11 +216,11 @@ public class RegionalizationEnvironment {
         if (DEBUG)
             Log.d(TAG, "loadExcludedApps!");
 
-        if (getPackagesCount() == 0) return;
+        if (getCarriersCount() == 0) return;
 
-        for (Package pack : mPackages) {
-            Log.d(TAG, "load excluded apps for " + pack.getDirectory());
-            String excListFilePath = pack.getExcludedListFilePath();
+        for (Carrier carrier : mCarriers) {
+            Log.d(TAG, "load excluded apps for " + carrier.getDirectory());
+            String excListFilePath = carrier.getExcludedListFilePath();
             ArrayList<String> contents = null;
             try {
                 contents = (ArrayList<String>)
@@ -244,12 +244,12 @@ public class RegionalizationEnvironment {
         }
     }
 
-    private static class Package {
+    private static class Carrier {
         private final String mName;
         private final int mPriority;
         private final String mStorage;
 
-        public Package(String name, int priority, String storage) {
+        public Carrier(String name, int priority, String storage) {
             mName = name;
             mPriority = priority;
             mStorage = storage;
