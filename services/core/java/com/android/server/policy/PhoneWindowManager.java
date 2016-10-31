@@ -620,7 +620,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     int mOverscanBottom = 0;
 
     // What we do when the user long presses on home
-    private int mLongPressOnHomeBehavior;
+//    private int mLongPressOnHomeBehavior;
 
     // What we do when the user double-taps on home
     private int mDoubleTapOnHomeBehavior;
