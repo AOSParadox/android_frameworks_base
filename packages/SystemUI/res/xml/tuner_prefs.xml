@@ -82,6 +82,12 @@
 
         <!-- other weird signal stuff -->
 
+        <!-- VoLTE -->
+
+        <com.android.systemui.tuner.StatusBarSwitch 
+            android:key="volte"
+            android:title="@string/status_bar_volte" />
+
         <com.android.systemui.tuner.BatteryPreference
             android:title="@string/battery"
             android:summary="%s"

@@ -63,6 +63,7 @@ public class SignalClusterView
     private static final String SLOT_MOBILE = "mobile";
     private static final String SLOT_WIFI = "wifi";
     private static final String SLOT_ETHERNET = "ethernet";
+    private static final String SLOT_VOLTE = "volte";
 
     NetworkControllerImpl mNC;
     SecurityController mSC;
@@ -113,6 +114,7 @@ public class SignalClusterView
     private boolean mBlockMobile;
     private boolean mBlockWifi;
     private boolean mBlockEthernet;
+    private boolean mBlockVolte;
     private TelephonyManager mTelephonyManager;
 
     public SignalClusterView(Context context) {
@@ -153,13 +155,15 @@ public class SignalClusterView
         boolean blockMobile = blockList.contains(SLOT_MOBILE);
         boolean blockWifi = blockList.contains(SLOT_WIFI);
         boolean blockEthernet = blockList.contains(SLOT_ETHERNET);
+        boolean blockVolte = blockList.contains(SLOT_VOLTE);
 
         if (blockAirplane != mBlockAirplane || blockMobile != mBlockMobile
-                || blockEthernet != mBlockEthernet || blockWifi != mBlockWifi) {
+                || blockEthernet != mBlockEthernet || blockWifi != mBlockWifi || blockVolte != mBlockVolte) {
             mBlockAirplane = blockAirplane;
             mBlockMobile = blockMobile;
             mBlockEthernet = blockEthernet;
             mBlockWifi = blockWifi;
+            mBlockVolte = blockVolte;
             // Re-register to get new callbacks.
             mNC.removeSignalCallback(this);
             mNC.addSignalCallback(this);
@@ -614,7 +618,7 @@ public class SignalClusterView
             mAirplane.setVisibility(View.GONE);
         }
 
-        if (mImsOverWifi){
+        if (mImsOverWifi && !mBlockVolte) {
             mImsOverWifiImageView.setVisibility(View.VISIBLE);
         } else {
             mImsOverWifiImageView.setVisibility(View.GONE);
@@ -680,6 +684,7 @@ public class SignalClusterView
 
     private void applyIconTint() {
         setTint(mVpn, StatusBarIconController.getTint(mTintArea, mVpn, mIconTint));
+        setTint(mMobileImsImageView, StatusBarIconController.getTint(mTintArea, mMobileImsImageView, mIconTint));
         setTint(mAirplane, StatusBarIconController.getTint(mTintArea, mAirplane, mIconTint));
         applyDarkIntensity(
                 StatusBarIconController.getDarkIntensity(mTintArea, mNoSims, mDarkIntensity),
