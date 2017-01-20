@@ -2216,6 +2216,12 @@ message MetricsEvent {
     // Hardware Keys managment menu
     BUTTONS = 497;
 
+    // OPEN: QS VoLTE tile shown
+    // ACTION: QS VoLTE tile tapped
+    //   SUBTYPE: 0 is off, 1 is on
+    // CATEGORY: QUICK_SETTINGS
+    QS_VOLTE = 498;
+
     // Add new aosp constants above this line.
     // END OF AOSP CONSTANTS
   }
