@@ -19,6 +19,7 @@ package com.android.systemui.qs.tiles;
 import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
+import android.provider.Settings.Global;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
@@ -35,6 +36,7 @@ import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto.MetricsEvent;
 import com.android.systemui.R;
 import com.android.systemui.qs.QSTile;
+import com.android.systemui.qs.GlobalSetting;
 
 public class VolteTile extends QSTile<QSTile.BooleanState> {
 
@@ -51,6 +53,7 @@ public class VolteTile extends QSTile<QSTile.BooleanState> {
                 handleRefreshState(value);
             }
         };
+    }
 
     @Override
     public boolean isAvailable() {
@@ -95,7 +98,6 @@ public class VolteTile extends QSTile<QSTile.BooleanState> {
     @Override
     protected void handleUpdateState(BooleanState state, Object arg) {
         final boolean isActivated = isVolteInUse();
-        state.visible = isVolteAvailable();
         state.value = isVolteInUse();
         state.label = mContext.getString(R.string.quick_settings_volte_label);
         state.icon = ResourceIcon.get(isActivated ? R.drawable.ic_volte_enable
@@ -138,7 +140,6 @@ public class VolteTile extends QSTile<QSTile.BooleanState> {
         return mContext.getString(R.string.quick_settings_volte_label);
     }
 
-    @Override
     public void onActivated(boolean activated) {
         refreshState();
     }
@@ -166,15 +167,18 @@ public class VolteTile extends QSTile<QSTile.BooleanState> {
      * Write VoLTE state to IMS manager.
      */
     private boolean setVolte(boolean enabled) {
-        ImsManager imsMan = ImsManager.getInstance(mContext,
-                SubscriptionManager.getDefaultVoicePhoneId());
-        if (imsMan == null) return false;
-        try {
-            imsMan.setAdvanced4GMode(enabled);
-            return true;
-        } catch (ImsException ie) {
-            return false;
-        }
+        ImsManager imsManager = ImsManager.getInstance(mContext,
+            SubscriptionManager.getDefaultVoicePhoneId());
+        if (imsManager != null) {
+            try {
+                imsManager.setAdvanced4GMode(enabled);
+		return true;
+            } catch (ImsException ie) {
+                return false;
+            }
+        } else {
+	    return false;
+	}
     }
 
     /**
