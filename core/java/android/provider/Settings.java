@@ -9967,28 +9967,4 @@ public final class Settings {
         }
         return packages[0];
     }
-
-        /**
-         * Network traffic indicator mode
-         * 0 = Don't show network traffic indicator
-         * 1 = Display up-stream traffic only
-         * 2 = Display down-stream traffic only
-         * 3 = Display both up- and down-stream traffic
-         * @hide
-         */
-        public static final String NETWORK_TRAFFIC_MODE = "network_traffic_mode";
-
-        /**
-         * Whether or not to hide the network traffic indicator when there is no activity
-         * @hide
-         */
-        public static final String NETWORK_TRAFFIC_AUTOHIDE = "network_traffic_autohide";
-
-        /**
-         * Network traffic inactivity threshold (default is 5 kBs)
-         * @hide
-         */
-        public static final String NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD =
-                "network_traffic_autohide_threshold";
-
 }
