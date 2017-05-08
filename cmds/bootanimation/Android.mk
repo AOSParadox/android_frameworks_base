@@ -26,7 +26,8 @@ LOCAL_SHARED_LIBRARIES := \
     libGLESv1_CM \
     libgui \
     libOpenSLES \
-    libtinyalsa
+    libtinyalsa \
+    libregionalization
 
 LOCAL_MODULE:= bootanimation
 
