@@ -77,7 +77,6 @@ import com.android.keyguard.KeyguardDisplayManager;
 import com.android.keyguard.KeyguardSecurityView;
 import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.keyguard.KeyguardUpdateMonitorCallback;
-import com.android.keyguard.SubsidyUtility;
 import com.android.keyguard.ViewMediatorCallback;
 import com.android.systemui.SystemUI;
 import com.android.systemui.SystemUIFactory;
@@ -345,8 +344,6 @@ public class KeyguardViewMediator extends SystemUI {
 
     private boolean mIsPerUserLock;
 
-    private boolean mIsSubsidyOrDeviceLocked;
-
     KeyguardUpdateMonitorCallback mUpdateCallback = new KeyguardUpdateMonitorCallback() {
 
         @Override
@@ -397,32 +394,6 @@ public class KeyguardViewMediator extends SystemUI {
         }
 
         @Override
-        public void onSubsidyLockStateChanged(boolean isLocked) {
-            synchronized (KeyguardViewMediator.this) {
-                mIsSubsidyOrDeviceLocked = isLocked;
-                int size = mKeyguardStateCallbacks.size();
-                for (int i = size - 1; i >= 0; i--) {
-                    try {
-                        mKeyguardStateCallbacks.get(i).
-                                onSimSecureStateChanged(isLocked);
-                    } catch (RemoteException e) {
-                        Slog.w(TAG, "Failed to call onSimSecureStateChanged", e);
-                        if (e instanceof DeadObjectException) {
-                            mKeyguardStateCallbacks.remove(i);
-                        }
-                    }
-                }
-
-                if (DEBUG) Log.d(TAG, "Subsidy lock state changed");
-                if (!mShowing) {
-                    doKeyguardLocked(null);
-                } else {
-                    resetStateLocked();
-                }
-            }
-        }
-
-        @Override
         public void onClockVisibilityChanged() {
             adjustStatusBarLocked();
         }
@@ -447,7 +418,7 @@ public class KeyguardViewMediator extends SystemUI {
             }
 
             int size = mKeyguardStateCallbacks.size();
-            boolean simPinSecure = mUpdateMonitor.isSimPinSecure() || mIsSubsidyOrDeviceLocked;
+            boolean simPinSecure = mUpdateMonitor.isSimPinSecure();
             for (int i = size - 1; i >= 0; i--) {
                 try {
                     mKeyguardStateCallbacks.get(i).onSimSecureStateChanged(simPinSecure);
@@ -752,8 +723,6 @@ public class KeyguardViewMediator extends SystemUI {
 
         mHideAnimation = AnimationUtils.loadAnimation(mContext,
                 com.android.internal.R.anim.lock_screen_behind_enter);
-        mIsSubsidyOrDeviceLocked = SubsidyUtility
-                                         .shouldShowSubsidyLock(mContext);
     }
 
     @Override
@@ -1288,8 +1257,7 @@ public class KeyguardViewMediator extends SystemUI {
             final boolean disabled = SubscriptionManager.isValidSubscriptionId(
                     mUpdateMonitor.getNextSubIdForState(IccCardConstants.State.PERM_DISABLED));
             final boolean lockedOrMissing = mUpdateMonitor.isSimPinSecure()
-                || ((absent || disabled) && requireSim)
-                || mIsSubsidyOrDeviceLocked;
+                    || ((absent || disabled) && requireSim);
 
             if (!lockedOrMissing && shouldWaitForProvisioning()) {
                 if (DEBUG) Log.d(TAG, "doKeyguard: not showing because device isn't provisioned"
@@ -1419,8 +1387,7 @@ public class KeyguardViewMediator extends SystemUI {
 
     public boolean isSecure() {
         return mLockPatternUtils.isSecure(KeyguardUpdateMonitor.getCurrentUser())
-            || KeyguardUpdateMonitor.getInstance(mContext).isSimPinSecure()
-            || mIsSubsidyOrDeviceLocked;
+            || KeyguardUpdateMonitor.getInstance(mContext).isSimPinSecure();
     }
 
     /**
@@ -2106,8 +2073,7 @@ public class KeyguardViewMediator extends SystemUI {
         synchronized (this) {
             mKeyguardStateCallbacks.add(callback);
             try {
-                callback.onSimSecureStateChanged(mUpdateMonitor.isSimPinSecure()
-                        || mIsSubsidyOrDeviceLocked);
+                callback.onSimSecureStateChanged(mUpdateMonitor.isSimPinSecure());
                 callback.onShowingStateChanged(mShowing);
                 callback.onInputRestrictedStateChanged(mInputRestricted);
                 callback.onTrustedChanged(mUpdateMonitor.getUserHasTrust(
